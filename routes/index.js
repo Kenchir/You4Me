@@ -78,26 +78,26 @@ router.post("/help", (req, res) => {
         timestamp
     );
     request({
-            method: "POST",
-            url: " https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-            headers: {
-                Authorization: accessToken,
-            },
-            json: {
-                BusinessShortCode: "174379",
-                Password: pass,
-                Timestamp: timestamp,
-                TransactionType: "CustomerPayBillOnline",
-                Amount: "1",
-                PartyA: phoneNumber,
-                PartyB: "174379",
-                PhoneNumber: phoneNumber,
-                CallBackURL: "https://siasia.herokuapp.com/api/property/payment/cb",
-                //    "https://8081-db6e9531-a657-426e-ad2f-6e05bf8d1c77.ws-eu01.gitpod.io/api/property/payment/cb",
-                AccountReference: "test",
-                TransactionDesc: "test ",
-            },
+        method: "POST",
+        url: " https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+        headers: {
+            Authorization: accessToken,
         },
+        json: {
+            BusinessShortCode: "174379",
+            Password: pass,
+            Timestamp: timestamp,
+            TransactionType: "CustomerPayBillOnline",
+            Amount: "50",
+            PartyA: phoneNumber,
+            PartyB: "174379",
+            PhoneNumber: phoneNumber,
+            CallBackURL: "https://siasia.herokuapp.com/api/property/payment/cb",
+            //    "https://8081-db6e9531-a657-426e-ad2f-6e05bf8d1c77.ws-eu01.gitpod.io/api/property/payment/cb",
+            AccountReference: "test",
+            TransactionDesc: "test ",
+        },
+    },
         (error, response, body) => {
             if (error) throw new Error(error);
             else {
@@ -124,15 +124,92 @@ router.post("/help", (req, res) => {
         }
     );
 });
+router.post('/donate', (req, res) => {
+    const { amount, phone } = req.body;
+    if (!phone) {
+        // console.log("error")
+        req.flash("error", "Phone number Missing");
+        return res.redirect("back");
+    }
+    if (!amount) {
+        req.flash("error", "Amount Missing");
+        return res.redirect("back");
+    }
+
+    let phoneNumber = phone.split("");
+
+    if (phoneNumber.length != 10) {
+        req.flash("error", "Phone number must be in format of 0712345678");
+        return res.redirect("back");
+    }
+    if (phoneNumber[0] != "0" || phoneNumber[1] != "7") {
+        console.log("Phone Number");
+        req.flash("error", "Phone number must be in format of 0712345678");
+        return res.redirect("back");
+    }
+    phoneNumber = "254" + phone.slice(1);
+    const timestamp = moment(new Date()).format("YYYYMMDDHHMMSS");
+    let pass = Base64.encode(
+        "174379" +
+        "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" +
+        timestamp
+    );
+    request({
+        method: "POST",
+        url: " https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+        headers: {
+            Authorization: accessToken,
+        },
+        json: {
+            BusinessShortCode: "174379",
+            Password: pass,
+            Timestamp: timestamp,
+            TransactionType: "CustomerPayBillOnline",
+            Amount: amount,
+            PartyA: phoneNumber,
+            PartyB: "174379",
+            PhoneNumber: phoneNumber,
+            CallBackURL: "https://siasia.herokuapp.com/api/property/payment/cb",
+            //    "https://8081-db6e9531-a657-426e-ad2f-6e05bf8d1c77.ws-eu01.gitpod.io/api/property/payment/cb",
+            AccountReference: "test",
+            TransactionDesc: "test ",
+        },
+    },
+        (error, response, body) => {
+            if (error) throw new Error(error);
+            else {
+                console.log(body);
+                //  console.log("here", body);
+                switch (body.ResponseCode) {
+                    case "0":
+                        req.flash(
+                            "success",
+                            "Kindly check your phone to complete the registration and enter your Mpesa Pin"
+                        );
+                        res.redirect("back");
+                        break;
+                    default:
+                        req.flash(
+                            "error",
+                            "There was an error in your phone number. Try the correct phone"
+                        );
+                        res.redirect("back");
+
+                        break;
+                }
+            }
+        }
+    );
+})
 router.post("/cb", (req, res, next) => {
     const { stkCallback } = req.body.Body;
     //console.log(stkCallback.ResultCode);
     if (stkCallback.ResultCode == 0) {
         //console.log("executed");
         Transaction.findOne({
-                merchantRequestId: stkCallback.MerchantRequestID,
-                checkoutRequestId: stkCallback.CheckoutRequestID,
-            })
+            merchantRequestId: stkCallback.MerchantRequestID,
+            checkoutRequestId: stkCallback.CheckoutRequestID,
+        })
             .then((trans) => {
                 trans.status = "completed";
                 trans.save().then((transaction) => {
@@ -155,9 +232,9 @@ router.post("/cb", (req, res, next) => {
     } else {
         // console.log("here");
         Transaction.findOne({
-                merchantRequestId: stkCallback.MerchantRequestID,
-                checkoutRequestId: stkCallback.CheckoutRequestID,
-            })
+            merchantRequestId: stkCallback.MerchantRequestID,
+            checkoutRequestId: stkCallback.CheckoutRequestID,
+        })
             .then((trans) => {
                 trans.status = "failed";
                 trans.save();
@@ -182,7 +259,7 @@ const generateCredentials = () => {
         },
     };
 
-    request(options, function(error, response, body) {
+    request(options, function (error, response, body) {
         try {
             if (error) {
                 console.log("Error", error);

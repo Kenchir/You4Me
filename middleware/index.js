@@ -11,7 +11,7 @@ const xoauth2 = require("xoauth2");
 
 const logger = require("../logger/logger");
 
-middlewareObj.isLoggedIn = function(req, res, next) {
+middlewareObj.isLoggedIn = function (req, res, next) {
     // console.log('passed')
     if (req.isAuthenticated()) {
         return next();
@@ -23,7 +23,7 @@ middlewareObj.isLoggedIn = function(req, res, next) {
 
 //To check is user is Admin
 
-middlewareObj.sendEmail = async({ message, subject, receiver }, req, res) => {
+middlewareObj.sendEmail = async ({ message, subject, receiver }, req, res) => {
     let status = {};
     const smtpTransport = await nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -61,7 +61,7 @@ middlewareObj.sendEmail = async({ message, subject, receiver }, req, res) => {
         return status;
     });
 };
-middlewareObj.isAdmin = function(req, res, next) {
+middlewareObj.isAdmin = function (req, res, next) {
     //  console.log('At this', req.user);
     if (
         req.user.role == "admin" ||
@@ -84,7 +84,7 @@ middlewareObj.isAdmin = function(req, res, next) {
         res.redirect("back");
     }
 };
-middlewareObj.isMasterAdmin = function(req, res, next) {
+middlewareObj.isMasterAdmin = function (req, res, next) {
     if (req.user.role == "master-admin") {
         return next();
     } else {
@@ -101,7 +101,7 @@ middlewareObj.isMasterAdmin = function(req, res, next) {
     }
 };
 
-middlewareObj.isClient = function(req, res, next) {
+middlewareObj.isClient = function (req, res, next) {
     // console.log('Role', req.user.role)
 
     if (req.user.role == "client") {
@@ -120,7 +120,7 @@ middlewareObj.isClient = function(req, res, next) {
     }
 };
 
-middlewareObj.isRealString = function(str) {
+middlewareObj.isRealString = function (str) {
     return typeof str === "string" && str.trim().length > 0;
 };
 
@@ -136,7 +136,7 @@ middlewareObj.isActive = (req, res, next) => {
     });
 };
 
-middlewareObj.isInArray = function(value, array) {
+middlewareObj.isInArray = function (value, array) {
     return array.indexOf(value) > -1;
 };
 middlewareObj.compare = function compare(a, b) {
@@ -144,7 +144,7 @@ middlewareObj.compare = function compare(a, b) {
     if (a.similarity > b.similarity) return -1;
     return 0;
 };
-middlewareObj.stripEndQuotes = function(s) {
+middlewareObj.stripEndQuotes = function (s) {
     var t = s.length;
     s = s.substring(1, t--);
     s = s.substring(0, t);
@@ -174,12 +174,12 @@ middlewareObj.capitalize = function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 };
 // to check if it is empty
-middlewareObj.isEmpty = function(str) {
+middlewareObj.isEmpty = function (str) {
     return !str || 0 === str.length;
 };
 
 //function generate random string
-middlewareObj.randomStr = function() {
+middlewareObj.randomStr = function () {
     var text = "";
     var possible =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -190,7 +190,7 @@ middlewareObj.randomStr = function() {
     return text;
 };
 //Delete values from array
-middlewareObj.removeA = function(arr) {
+middlewareObj.removeA = function (arr) {
     var what,
         a = arguments,
         L = a.length,
@@ -207,7 +207,7 @@ middlewareObj.removeA = function(arr) {
 
 //ignore favicon
 
-middlewareObj.createToken = function() {
+middlewareObj.createToken = function () {
     crypto.randomBytes(20, (err, buf) => {
         var token = buf.toString("hex");
         return token;
