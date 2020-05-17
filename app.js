@@ -27,7 +27,8 @@ var app = express();
 var server = require("http").createServer(app);
 
 var indexRoutes = require("./routes/index");
-const dbUrl = "mongodb://127.0.0.1:27017/you4me";
+const dbUrl =
+    "mongodb+srv://admin:123@cluster0-gksqt.mongodb.net/you4me?retryWrites=true&w=majority";
 
 mongoose.set("useCreateIndex", true);
 mongoose
@@ -109,7 +110,6 @@ app.use((req, res, next) => {
 //Use routes exported from other files
 
 app.use(indexRoutes);
-
 
 app.all("*", (req, res) => {
     res.redirect("/home");
