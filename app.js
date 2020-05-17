@@ -62,11 +62,11 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
     done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
+passport.deserializeUser(function (user, done) {
     done(null, user);
 });
 
